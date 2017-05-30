@@ -1,0 +1,131 @@
+.prestart-fatigue-report {
+    width: 596pt;
+    margin: 0 auto;
+    font-family: 'RobotoRegular', sans-serif;
+    line-height: 1.2;
+    color: #58585B;
+}
+
+.prestart-fatigue-report p {
+    margin-top: 0;
+}
+
+.prestart-fatigue-report ul {
+    list-style-type: none;
+    display: inline-block;
+    font-size: 10pt;
+    line-height: 1.8;
+    padding-left: 0;
+}
+
+.prestart-fatigue-report ul.dashed, ul.decimal-leading-zero {
+    margin: 0;
+    font-family: 'RobotoRegular', sans-serif;
+}
+
+.prestart-fatigue-report ul.dashed > li .declare,
+.prestart-fatigue-report ul.decimal-leading-zero > li .declare {
+    display: inline-block;
+    margin-right: 10pt;
+}
+
+.prestart-fatigue-report ul.dashed > li .answer,
+.prestart-fatigue-report ul.decimal-leading-zero > li .answer {
+    font-family: 'RobotoBold', sans-serif;
+    font-weight: bold;
+}
+
+.prestart-fatigue-report ul.dashed > li:before {
+    content: "-";
+    margin-right: 3pt;
+}
+
+.prestart-fatigue-report ul.dashed > li .declare {
+    min-width: 150pt;
+}
+
+.prestart-fatigue-report ul.decimal-leading-zero > li .declare {
+    min-width: 110pt;
+}
+
+.prestart-fatigue-report ul.decimal-leading-zero {
+    list-style-type: decimal-leading-zero;
+    margin: 0;
+    padding-left: 18pt;
+}
+
+/*------------------------------------------------------------*/
+.prestart-fatigue-report .logo-brand {
+    text-align: right;
+    margin-bottom: 10pt;
+}
+
+.prestart-fatigue-report .logo-brand img {
+    max-width: 80pt;
+}
+
+.prestart-fatigue-report h1, h2 {
+    font-weight: 100;
+    color: #F05A29;
+    text-transform: uppercase;
+}
+
+.prestart-fatigue-report h1 {
+    font-family: 'RobotoThin', sans-serif;
+    font-size: 30pt;
+    margin-top: 0;
+    margin-bottom: 10pt;
+}
+
+.prestart-fatigue-report h2 {
+    font-family: 'RobotoLight', sans-serif;
+    font-size: 13pt;
+    margin-bottom: 6pt;
+}
+
+.prestart-fatigue-report h2 .black {
+    color: #231F20;
+}
+
+.prestart-fatigue-report .date-time {
+    border-left: 2pt solid #939597;
+    padding-left: 10pt;
+    font-size: 11pt;
+    font-family: 'RobotoLight', sans-serif;;
+    color: #6D6E70;
+    margin-bottom: 47pt;
+}
+
+.prestart-fatigue-report .date-time .date {
+    margin-bottom: 5pt;
+    margin-top: -6pt;
+}
+
+.prestart-fatigue-report .personal {
+    margin-bottom: 27pt;
+}
+
+.prestart-fatigue-report .block-small {
+    font-size: 9pt;
+}
+
+.prestart-fatigue-report .p-l-20 {
+    padding-left: 20pt;
+}
+
+.prestart-fatigue-report .font-light {
+    font-family: RobotoLight, sans-serif;
+    color: #939597;
+}
+
+.prestart-fatigue-report .answer-small {
+    color: #231F20;
+}
+
+.prestart-fatigue-report .block-small div[class*="col-"] {
+    padding: 0;
+}
+
+.prestart-fatigue-report .block-small .row .comment-label {
+    max-width: 56px;
+}

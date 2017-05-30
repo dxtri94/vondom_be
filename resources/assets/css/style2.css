@@ -1,0 +1,145 @@
+.prestart-fatigue {
+    margin: 0 auto;
+    max-width: 1200px;
+    font-family: 'robotoregular', sans-serif;
+    line-height: 1.2;
+    color: #58585B;
+}
+
+p {
+    margin-top: 0;
+}
+
+ul {
+    list-style-type: none;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 1.8;
+    padding-left: 0;
+}
+
+ul.dashed, ul.decimal-leading-zero {
+    margin: 0;
+    font-family: 'robotoregular', sans-serif;
+    width: 100%;
+    color: #57585A;
+}
+
+ul.dashed > li .declare, ul.decimal-leading-zero > li .declare {
+    display: inline-block;
+    margin-right: 16px;
+}
+
+ul.dashed > li .answer, ul.decimal-leading-zero > li .answer {
+    font-family: 'robotobold', sans-serif;
+    font-weight: bold;
+    color: #231F3A;
+}
+
+ul.dashed > li:before {
+    /*content: "-";*/
+    /*margin-right: 5px;*/
+}
+
+ul.dashed > li .declare {
+    min-width: 252px;
+}
+
+ul.decimal-leading-zero > li .declare {
+    min-width: 185px;
+}
+
+ul.decimal-leading-zero {
+    margin: 0;
+    padding-left: 0px;
+}
+
+ul.decimal-leading-zero > li > div.continue-comment {
+    padding-left: 50px;
+}
+
+.font-light {
+
+}
+
+/*------------------------------------------------------------*/
+.logo-brand {
+    text-align: right;
+    margin-bottom: 16px;
+}
+
+.logo-brand img {
+    max-width: 100px;
+}
+
+h1, h2 {
+    font-weight: 100;
+    color: #F05A29;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-family: 'robotothin', sans-serif;
+    font-size: 50px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+h2 {
+    font-family: 'robotolight', sans-serif;
+    font-size: 21px;
+    margin-bottom: 16px;
+}
+
+h2 .black {
+    color: #231F20;
+}
+
+.vehicle {
+    margin-bottom: 40px;
+}
+
+.date-time {
+    border-left: 3px solid #939597;
+    padding-left: 16px;
+    font-size: 18px;
+    font-family: 'robotolight', sans-serif;;
+    color: #6D6E70;
+    margin-bottom: 45px;
+}
+
+.date-time .date {
+    margin-bottom: 8px;
+    margin-top: -10px;
+}
+
+.personal {
+    margin-bottom: 45px;
+}
+
+.block-small {
+    font-size: 14px;
+}
+
+.p-l-20 {
+    padding-left: 32px;
+}
+
+.font-light {
+    font-family: robotolight, sans-serif;
+    color: #939597;
+}
+
+.answer-small {
+    color: #231F3A;
+}
+
+.block-small div[class*="col-"] {
+    padding: 0;
+}
+
+.block-small .row:last-child div[class*="col-"]:first-child {
+    width: 90px;
+}
+
+.comment-label
