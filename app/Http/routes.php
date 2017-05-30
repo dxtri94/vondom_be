@@ -27,7 +27,7 @@ Route::group(array(
             'prefix' => '/categories'
         ), function () {
             Route::get('/', 'Api\CategoriesController@index');
-            Route::get('/{id}', 'Api\PlatformController@get');
+            Route::get('/{id}', 'Api\CategoriesController@get');
         });
 
     Route::get('/test', function () {
