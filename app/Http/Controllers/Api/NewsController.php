@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBasicController;
-use App\Models\Newsletter;
+use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
 
@@ -45,22 +45,11 @@ class NewsController extends ApiBasicController
     public function index(Request $request)
     {
         try {
-            // TODO get all newsletters
-
-            $query = new Newsletter();
-
-            // query by top newsletters
-            if ($request->has('type') AND $request->get('type') === 'top') {
-                $newsletters = $query->orderBy('updated_at', 'DESC')
-                    ->offset(0)->limit($request->get('len', 3))
-                    ->get();
-            } else {
-                $newsletters = $query->paginate($request->get('per_page', 20));
-            }
-
-            return $this->success($newsletters);
-
-        } catch (Exeception $e) {
+            // TODO get all categories
+            $query = new News();
+            $news = $query->paginate($request->get('per_page', 10));
+            return $this->success($news);
+        } catch (Exception $e) {
             return $this->badRequest($e->getMessage());
         }
     }
@@ -73,13 +62,13 @@ class NewsController extends ApiBasicController
             $error = $this->error;
 
             // find newsletter
-            $newsletter = Newsletter::find($id);
+            $news = News::find($id);
 
-            if (!$newsletter) {
-                return $this->notFound($error['newsletter_not_found'], $error['ApiErrorCodes']['newsletter_not_found']);
+            if (!$news) {
+                return $this->notFound($error['news_not_found'], $error['ApiErrorCodes']['news_not_found']);
             }
 
-            return $this->success($newsletter);
+            return $this->success($news);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());

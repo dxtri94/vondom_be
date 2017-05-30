@@ -28,6 +28,20 @@ Route::group(array(
         ), function () {
             Route::get('/', 'Api\CategoriesController@index');
             Route::get('/{id}', 'Api\CategoriesController@get');
+            Route::get('/{id}/products', 'Api\CategoriesController@getProduct');
+        });
+
+// products
+        Route::group(array(
+            'prefix' => '/products'
+        ), function () {
+
+            Route::get('/', 'Api\ProductController@index');
+            Route::get('/{id}', 'Api\ProductController@get');
+            Route::post('/', 'Api\ProductController@create');
+            Route::put('/{id}', 'Api\ProductController@update');
+            Route::delete('/{id}', 'Api\ProductController@delete');
+
         });
 
     Route::get('/test', function () {
@@ -54,6 +68,40 @@ Route::group(array(
         Route::get('/results/{hash}', 'Api\ImageController@getResultImage');
         Route::get('/results/{hash}/thumbnail', 'Api\ImageController@getResultThumbnail');
     });
+
+    // collections
+        Route::group(array(
+            'prefix' => '/collections'
+        ), function () {
+            Route::get('/', 'Api\CollectionController@index');
+            Route::get('/{id}', 'Api\CollectionController@get');
+            Route::get('/{id}/products', 'Api\CollectionController@getProduct');
+            Route::post('/', 'Api\CollectionController@create');
+            Route::put('/{id}', 'Api\CollectionController@update');
+            Route::delete('/{id}', 'Api\CollectionController@delete');
+        });
+
+        // catalogs
+        Route::group(array(
+            'prefix' => '/catalogs'
+        ), function () {
+            Route::get('/', 'Api\CatalogController@index');
+            Route::get('/{id}', 'Api\CatalogController@get');
+            Route::post('/', 'Api\CatalogController@create');
+            Route::put('/{id}', 'Api\CatalogController@update');
+            Route::delete('/{id}', 'Api\CatalogController@delete');
+        });
+
+        // news
+        Route::group(array(
+            'prefix' => '/news'
+        ), function () {
+            Route::get('/{id}', 'Api\NewsController@get');
+            Route::post('/', 'Api\NewsController@create');
+            Route::put('/{id}', 'Api\NewsController@update');
+            Route::delete('/{id}', 'Api\NewsController@delete');
+        });
+
 
     // apis require authenticated
     Route::group(array(
@@ -111,19 +159,6 @@ Route::group(array(
             Route::delete('/{id}', 'Api\UserController@delete');
         });
 
-        // products
-        Route::group(array(
-            'prefix' => '/products'
-        ), function () {
-
-            Route::get('/', 'Api\ProductController@index');
-            Route::get('/{id}', 'Api\ProductController@get');
-            Route::post('/', 'Api\ProductController@create');
-            Route::put('/{id}', 'Api\ProductController@update');
-            Route::delete('/{id}', 'Api\ProductController@delete');
-
-        });
-
 //        // categories
 //        Route::group(array(
 //            'prefix' => '/categories'
@@ -136,37 +171,6 @@ Route::group(array(
 //
 //        });
 
-        // collections
-        Route::group(array(
-            'prefix' => '/collections'
-        ), function () {
-            Route::get('/', 'Api\CollectionController@index');
-            Route::get('/{id}', 'Api\CollectionController@get');
-            Route::post('/', 'Api\CollectionController@create');
-            Route::put('/{id}', 'Api\CollectionController@update');
-            Route::delete('/{id}', 'Api\CollectionController@delete');
-        });
-
-        // catalogs
-        Route::group(array(
-            'prefix' => '/catalogs'
-        ), function () {
-            Route::get('/', 'Api\CatalogController@index');
-            Route::get('/{id}', 'Api\CatalogController@get');
-            Route::post('/', 'Api\CatalogController@create');
-            Route::put('/{id}', 'Api\CatalogController@update');
-            Route::delete('/{id}', 'Api\CatalogController@delete');
-        });
-
-        // news
-        Route::group(array(
-            'prefix' => '/news'
-        ), function () {
-            Route::get('/{id}', 'Api\NewsController@get');
-            Route::post('/', 'Api\NewsController@create');
-            Route::put('/{id}', 'Api\NewsController@update');
-            Route::delete('/{id}', 'Api\NewsController@delete');
-        });
     });
 
     Route::group(array(

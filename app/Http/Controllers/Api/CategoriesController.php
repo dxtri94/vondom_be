@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBasicController;
 use App\Models\Categories;
-use App\Models\Favourite;
+use App\Models\Product;
 use App\Models\Result;
 use App\Models\Role;
 use App\Models\Game;
@@ -54,9 +54,7 @@ class CategoriesController extends ApiBasicController
     {
         try {
             // TODO get all categories
-            $query = Categories::with(array(
-                'product'
-            ));
+            $query = new Categories();
             $categories = $query->paginate($request->get('per_page', 10));
             return $this->success($categories);
         } catch (Exception $e) {
@@ -98,6 +96,33 @@ class CategoriesController extends ApiBasicController
             }
 
             return $this->success($categories);
+
+        } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
+    public function getProduct(Request $request, $id = 0)
+    {
+        try {
+            // TODO find game by id
+
+            $error = $this->error;
+//            $authToken = $request->attributes->get('authToken');
+//            $user = $authToken->user;
+
+            // find game
+            $categories = Categories::find($id);
+            if (!$categories) {
+                return $this->notFound($error['categories_not_found'], $error['ApiErrorCodes']['categories_not_found']);
+            }
+
+            $query = Product::where('categories_id', $id)
+                ->orderBy('updated_at', 'DESC');
+
+            $product = $query->paginate($request->get('per_page', 10));
+            
+            return $this->success($product);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());

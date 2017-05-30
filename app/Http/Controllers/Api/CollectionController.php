@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBasicController;
-use App\Models\Role;
+use App\Models\Collection;
 use App\Models\Dispute;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
@@ -47,21 +47,12 @@ class CollectionController extends ApiBasicController
     public function index(Request $request)
     {
         try {
-            // TODO get all disputes
-
-            $error = $this->error;
-            $authToken = $request->attributes->get('authToken');
-            $user = $authToken->user;
-
-            // detect permission
-            if (!$user->isAdmin()) {
-                return $this->badRequest($error['permissions_access_denied'], $error['ApiErrorCodes']['permissions_access_denied']);
-            }
-
-            $disputes = Dispute::orderBy('created_at', 'ASC')->all();
-
-            return $this->success($disputes);
-
+            // TODO get all collections
+            $query = Collection::with(array(
+                'categories'
+            ));
+            $collections = $query->paginate($request->get('per_page', 10));
+            return $this->success($collections);
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());
         }
@@ -87,6 +78,24 @@ class CollectionController extends ApiBasicController
      */
     public function get(Request $request, $id)
     {
+        try {
+            // TODO find game by id
+
+            $error = $this->error;
+//            $authToken = $request->attributes->get('authToken');
+//            $user = $authToken->user;
+
+            // find game
+            $collection = Collection::find($id);
+            if (!$collection) {
+                return $this->notFound($error['collections_not_found'], $error['ApiErrorCodes']['collections_not_found']);
+            }
+
+            return $this->success($collection);
+
+        } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
     }
 
     /**
@@ -151,49 +160,27 @@ class CollectionController extends ApiBasicController
         }
     }
 
-    /**
-     * @SWG\Api(
-     *   path="/api/disputes/{id}/solve",
-     *   @SWG\Operation(
-     *      method="PUT",
-     *      summary="Update Dispute Status to Solve",
-     *      nickname="updateDisputeSolve",
-     *
-     *      @SWG\Parameter( name="id", description="Dispute Id", required=true, type="integer", paramType="path", allowMultiple=false ),
-     *
-     *      @SWG\ResponseMessage(code=200, message="Success"),
-     *      @SWG\ResponseMessage(code=400, message="Permission Denied | Have Error in System"),
-     *      @SWG\ResponseMessage(code=401, message="Caller is not authenticated"),
-     *      @SWG\ResponseMessage(code=404, message="Resource not found"),
-     *   )
-     * )
-     */
-    public function solve(Request $request, $id = 0)
+    public function getProduct(Request $request, $id = 0)
     {
         try {
-            // TODO update dispute status to solve
+            // TODO find game by id
 
             $error = $this->error;
-            $authToken = $request->attributes->get('authToken');
-            $user = $authToken->user;
+//            $authToken = $request->attributes->get('authToken');
+//            $user = $authToken->user;
 
-            // detect permission
-            if (!$user->isAdmin()) {
-                return $this->badRequest($error['permissions_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            // find game
+            $collection = Collection::find($id);
+            if (!$collection) {
+                return $this->notFound($error['collections_not_found'], $error['ApiErrorCodes']['collections_not_found']);
             }
 
-            // find dispute
-            $dispute = Dispute::find($id);
-            if (!$dispute) {
-                return $this->notFound($error['disputes_not_found'], $error['ApiErrorCodes']['disputes_not_found']);
-            }
+            $query = Product::where('collections_id', $id)
+                ->orderBy('updated_at', 'DESC');
 
-            $dispute->fill(array(
-                'status' => config('constants.DISPUTE_STATUS.SOLVED')
-            ));
-            $dispute->save();
-
-            return $this->accepted($dispute);
+            $product = $query->paginate($request->get('per_page', 10));
+            
+            return $this->success($product);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());

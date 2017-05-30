@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBasicController;
-use App\Models\Challenge;
+use App\Models\Product;
 use App\Models\User;
 use App\Models\Game;
 use Carbon\Carbon;
@@ -36,7 +36,7 @@ class ProductController extends ApiBasicController
      *      summary="Get products",
      *      nickname="getProducts",
      *
-     *      @SWG\Parameter(name="type", description="type [pending|activated]", required=false, type="string", paramType="query", allowMultiple=false),
+     *      @SWG\Parameter(name="type", description="type [categories|collections]", required=false, type="string", paramType="query", allowMultiple=false),
      *
      *      @SWG\ResponseMessage(code=200, message="Success"),
      *      @SWG\ResponseMessage(code=400, message="Permission Denied | Have Error in System"),
@@ -47,38 +47,16 @@ class ProductController extends ApiBasicController
     public function index(Request $request)
     {
         try {
-            // TODO get challenges by
+            // TODO get product by
 
-            $authToken = $request->attributes->get('authToken');
-            $user = $authToken->user;
+            // $authToken = $request->attributes->get('authToken');
+            // $user = $authToken->user;
 
             // query
-            $query = Challenge::with(array(
-                'user',
-                'opponent'
-            ))
-                ->where(function ($query) use ($user) {
-                    $query->where('user_id', $user->id)
-                        ->orWhere('opponent_id', $user->id);
-                });
-
-            // detect by type
-            switch ($request->get('type')) {
-                case 'pending': {
-                    $query->whereIn('status', array(
-                        config('constants.CHALLENGE_STATUS.NEW'),
-                        config('constants.CHALLENGE_STATUS.WAITING')
-                    ))
-                        ->orderBy('created_at', 'DESC');
-
-                    break;
-                }
-                case 'activated': {
-                    $query->where('status', config('constants.CHALLENGE_STATUS.ACTIVATED'))
-                        ->orderBy('start_at');
-                    break;
-                }
-            }
+            $query = Product::with(array(
+                'categories',
+                'collection'
+            ));
             $challenges = $query->paginate($request->get('per_page', 10));
             return $this->success($challenges);
 
