@@ -66,12 +66,8 @@ class AuthAdminController extends ApiBasicController
             $input = $request->input();
 
             $messages = array(
-                'email.required' => $error['ApiErrorCodes']['users_email_required'],
-                'email.email' => $error['ApiErrorCodes']['users_email_email'],
-                'password.required' => $error['ApiErrorCodes']['users_password_required'],
-                'password.min' => $error['ApiErrorCodes']['users_password_min'],
-                'password.max' => $error['ApiErrorCodes']['users_password_max'],
-                'password.regex' => $error['ApiErrorCodes']['users_password_regex']
+                'username.required' => $error['ApiErrorCodes']['users_username_required'],
+                'password.required' => $error['ApiErrorCodes']['users_password_required']
             );
 
             // validation
@@ -80,19 +76,19 @@ class AuthAdminController extends ApiBasicController
                 return $this->respondWithError($validatorError);
             }
 
-            // query user
-            $user = User::where('email', $input['email'])->first();
+            // query username
+            $user = User::where('username', $input['username'])->first();
             if (empty($user)) {
-                return $this->notFound($error['users_email_invalid'], $error['ApiErrorCodes']['users_email_invalid']);
+                return $this->notFound($error['users_username_invalid'], $error['ApiErrorCodes']['users_username_invalid']);
             }
 
-            // permission admin
+            // permission Admin
             if (!$user->isAdmin()) {
                 return $this->badRequest($error['permissions_access_denied'], $error['ApiErrorCodes']['permissions_access_denied']);
             }
 
             // login
-            $authToken = AuthToken::login($input['email'], $input['password'], $request->get('is_remember', false), $request->has('timezone', 0));
+            $authToken = AuthToken::login($input['username'], $input['password'], $request->get('is_remember', false), $request->has('timezone', 0));
             if (empty($authToken)) {
                 return $this->badRequest($error['users_password_incorrect'], $error['ApiErrorCodes']['users_password_incorrect']);
             }
@@ -133,7 +129,7 @@ class AuthAdminController extends ApiBasicController
             }
 
             // detect role user
-            if ($user->role === config('constants.ROLES.COMPANY')) {
+            if ($user->role === config('constants.ROLES.USER')) {
                 return $this->badRequest($error['users_access_denied'], $error['ApiErrorCodes']['users_access_denied']);
             }
 

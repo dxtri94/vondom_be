@@ -11,51 +11,18 @@ class User extends BaseModel
     protected $table = 'users';
     protected $fillable = array(
         'username',
-        'email',
         'password',
-        'location_id',
-        'phone',
-        'address',
-        'path',
-        'role_id',
-        'social_type',
-        'social_id',
-        'last_login',
-        'is_deleted',
-        'gender',
-        'date_of_birth',
-        'coin',
-        'first_name',
-        'surname',
-        'province',
-        'city',
-        'postal_code',
-        'address1',
-        'address2',
-        'status',
-        'is_term_condition',
-        'is_privacy_policy',
-        'is_subscribe_email',
-        'verify_required_id'
+        'is_deleted'
     );
 
     protected $hidden = array(
-        'social_id',
-        'password',
-        'path',
-        'verify_required_id',
         'created_at',
         'updated_at'
     );
 
     protected $casts = array(
         'role_id' => 'integer',
-        'location_id' => 'integer',
-        'is_deleted' => 'boolean',
-        'is_term_condition' => 'boolean',
-        'is_privacy_policy' => 'boolean',
-        'is_subscribe_email' => 'boolean',
-        'coin' => 'double',
+        'is_deleted' => 'boolean'
     );
 
     protected $appends = array(
@@ -86,14 +53,10 @@ class User extends BaseModel
             'is_subscribe_email' => 'boolean'
         ),
         'RULE_LOGIN' => array(
-            'email' => 'required|email',
-            'password' => array(
-                'required',
-                'min:8',
-                'max:36',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/'
-            )
+            'username' => 'required',
+            'password' => 'required'
         ),
+
         'RULE_LOGIN_SOCIAL' => array(
             'social_id' => 'required',
             'social_type' => 'required'
@@ -203,14 +166,9 @@ class User extends BaseModel
     }
 
     /**
-     * fn check account type as super admin
+     * fn check account type as admin
      * @return bool
      */
-    public function isSuperAdmin()
-    {
-        return $this->role_id === config('constants.ROLEs.SUPER_ADMIN');
-    }
-
     public function isAdmin()
     {
         return $this->role_id === config('constants.ROLEs.ADMIN') || $this->isSuperAdmin();
@@ -245,125 +203,5 @@ class User extends BaseModel
     {
         return $this->belongsTo('App\Models\Token', 'user_id')
             ->orderBy('id', 'desc');
-    }
-
-    /**
-     * relation to locations
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function location()
-    {
-        return $this->belongsTo('App\Models\Location', 'location_id', 'id');
-    }
-
-    /**
-     * relation to challenges
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function challenges()
-    {
-        return $this->hasMany('App\Models\Challenge', 'user_id', 'id');
-    }
-
-    /**
-     * Has many favourites
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function favourites()
-    {
-        return $this->hasMany('App\Models\Challenge', 'user_id', 'id');
-    }
-
-    /**
-     * handle many disputes
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function disputes()
-    {
-        return $this->hasMany('App\Models\Dispute', 'user_id', 'id');
-    }
-
-    /**
-     * Has many transactions
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function transactions()
-    {
-        return $this->hasMany('App\Models\Transaction', 'user_id', 'id');
-    }
-
-    /**
-     * Create many games (admin)
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function games()
-    {
-        return $this->hasMany('App\Models\Game', 'user_id', 'id');
-    }
-
-    /**
-     * relation to bans (admin)
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function banned()
-    {
-        return $this->hasOne('App\Models\Ban', 'user_id', 'id');
-    }
-
-    /**
-     *
-     * has many platforms
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function userPlatforms()
-    {
-        return $this->hasMany('App\Models\User_Platform', 'user_id', 'id');
-    }
-
-    /**
-     *
-     * has many documents
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function documents()
-    {
-        return $this->hasMany('App\Models\Document', 'user_id', 'id');
-    }
-
-    /**
-     *
-     * has many notifications
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
-     */
-    public function notifications()
-    {
-        return $this->hasMany('App\Models\Notification', 'user_id', 'id');
-    }
-
-    /**
-     * fn account as registered
-     * @return bool
-     */
-    public function isRegisteredAccount()
-    {
-        return !$this->social_id && !$this->social_type;
-    }
-
-    /**
-     * fn account as registered
-     * @return bool
-     */
-    public function isVerifyEmail()
-    {
-        return $this->status === config('constants.USER_STATUS.VERIFY_EMAIL');
-    }
-
-    /**
-     * fn account as social network
-     * @return bool
-     */
-    public function isSocialAccount()
-    {
-        return $this->social_id && $this->social_type;
     }
 }

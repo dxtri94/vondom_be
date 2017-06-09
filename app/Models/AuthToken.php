@@ -71,10 +71,10 @@ class AuthToken extends BaseModel
      * @param bool $is_remember
      * @return null|object
      */
-    public static function login($email = '', $password = '', $is_remember = false, $timezone = 0)
+    public static function login($username = '', $password = '', $is_remember = false, $timezone = 0)
     {
         try {
-            $userCredential = User::where('email', $email)->first();
+            $userCredential = User::where('username', $username)->first();
 
             // check user and password
             if ($userCredential && Hash::check($password, $userCredential->password)) {
@@ -85,7 +85,7 @@ class AuthToken extends BaseModel
                 // store new token
                 $authToken = new AuthToken();
                 $authToken->fill(array(
-                    'token' => AuthToken::genToken($email . $password),
+                    'token' => AuthToken::genToken($username . $password),
                     'user_id' => $userCredential->id,
                     'expired_at' => Carbon::now()->addHours(2)->toDateTimeString(),
                     'is_remember' => (boolean)$is_remember,
@@ -93,11 +93,6 @@ class AuthToken extends BaseModel
                 ));
                 $authToken->save();
 
-                $userCredential->fill(array(
-                    'last_login' => date('Y-m-d H:i:s', time())
-                ));
-
-                $userCredential->save();
                 unset($userCredential->password);
                 $user->role;
 
