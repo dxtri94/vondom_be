@@ -28,11 +28,10 @@ class Product extends BaseModel
 
     public static $rules = array(
         'RULE_CREATE' => array(
-            'game_id' => 'required',
-            'opponent_id' => 'required',
-            'amount' => 'required|min:1|max:500|numeric|regex:/^[0-9]+(\.[0-9]{1,2})?$/',
-            'confirm_amount' => 'required|same:amount',
-            'description' => 'required',
+            'collection_id' => 'required',
+            'categories_id' => 'required',
+            'name' => 'required',
+            'detail' => 'required'
         ),
 
         'RULE_UPDATE' => array(

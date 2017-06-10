@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\ApiBasicController;
 use App\Models\Collection;
-use App\Models\Dispute;
+use App\Models\Product;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -222,7 +222,10 @@ class CollectionController extends ApiBasicController
                 return $this->notFound($error['collections_not_found'], $error['ApiErrorCodes']['collections_not_found']);
             }
 
-            $query = Product::where('collections_id', $id)
+            $query = Product::with(array(
+                'categories'
+            ))
+            ->where('collection_id', $id)
                 ->orderBy('updated_at', 'DESC');
 
             $product = $query->paginate($request->get('per_page', 10));

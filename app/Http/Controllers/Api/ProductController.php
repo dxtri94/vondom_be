@@ -123,155 +123,28 @@ class ProductController extends ApiBasicController
             $user = $authToken->user;
             $input = $request->input();
 
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
             // validation
             $messages = array(
-                'game_id.required' => $error['ApiErrorCodes']['challenges_game_id_required'],
-                'opponent_id.required' => $error['ApiErrorCodes']['challenges_opponent_id_required'],
-                'amount.required' => $error['ApiErrorCodes']['challenges_amount_required'],
-                'amount.min' => $error['ApiErrorCodes']['challenges_amount_min'],
-                'amount.max' => $error['ApiErrorCodes']['challenges_amount_max'],
-                'amount.numeric' => $error['ApiErrorCodes']['challenges_amount_invalid'],
-                'amount.regex' => $error['ApiErrorCodes']['challenges_amount_regex'],
-                'confirm_amount.required' => $error['ApiErrorCodes']['challenges_confirm_amount_required'],
-                'confirm_amount.same' => $error['ApiErrorCodes']['challenges_confirm_amount_same'],
-                'description.required' => $error['ApiErrorCodes']['challenges_description_required'],
+                'collection_id.required' => $error['ApiErrorCodes']['products_collection_id_required'],
+                'categories_id.required' => $error['ApiErrorCodes']['products_categories_id_required'],
+                'name.required' => $error['ApiErrorCodes']['products_name_required'],
+                'detail.requireds' => $error['ApiErrorCodes']['products_detail_required']
             );
-            $validatorError = Challenge::validate($input, 'RULE_CREATE', $messages);
+            $validatorError = Product::validate($input, 'RULE_CREATE', $messages);
             if (!empty($validatorError)) {
                 return $this->respondWithError($validatorError);
             }
 
-            // find game
-            $game = Game::find($request->get('game_id'));
-            if (!$game) {
-                return $this->notFound($error['games_not_found'], $error['ApiErrorCodes']['game_not_found']);
-            }
-
-            // find opponent
-            $opponent = User::find($request->get('opponent_id'));
-            if (!$opponent) {
-                return $this->notFound($error['users_not_found'], $error['ApiErrorCodes']['users_not_found']);
-            }
-
             // set params
-            $challenge = new Challenge($input);
+            $product = new Product($input);
+            $product->save();
 
-            $challenge->fill(array(
-                'user_id' => $user->id,
-                'user_status' => config('constants.CHALLENGE_STATUS.ACCEPTED'),
-                'opponent_status' => config('constants.CHALLENGE_STATUS.NEW'),
-                'status' => config('constants.CHALLENGE_STATUS.WAITING'),
-                'length' => 45,
-                'start_at' => Carbon::now()
-            ));
-            $challenge->save();
-
-            // notification to opponent
-            $this->sendNotifyTo('Head To Head Challenge', config('constants.NOTIFICATIONs.NEW_CHALLENGE'), array(
-                '@game' => $game->name,
-                '@user' => $user->surname
-            ), $opponent, $challenge);
-
-            return $this->created($challenge);
-
-        } catch (Exception $e) {
-            return $this->badRequest($e->getMessage());
-        }
-    }
-
-    /**
-     * @SWG\Model(
-     *  id="activeChallenge",
-     * 	@SWG\Property(name="action", type="string", required=true, defaultValue=""),
-     * )
-     */
-    /**
-     * @SWG\Api(
-     *   path="/api/challenges/{id}/{action}",
-     *   @SWG\Operation(
-     *      method="POST",
-     *      summary="Active Challenge",
-     *      nickname="activeChallenge",
-     *
-     *      @SWG\Parameter( name="id", description="Challenge Id", required=true, type="integer", paramType="path", allowMultiple=false ),
-     *      @SWG\Parameter( name="action", description="action [accept|decline]", required=true, type="activeChallenge", paramType="body", allowMultiple=false ),
-     *
-     *      @SWG\ResponseMessage(code=200, message="Success"),
-     *      @SWG\ResponseMessage(code=400, message="Permission Denied | Have Error in System"),
-     *      @SWG\ResponseMessage(code=401, message="Caller is not authenticated"),
-     *      @SWG\ResponseMessage(code=404, message="Resource not found"),
-     *   )
-     * )
-     */
-    public function activeChallenge(Request $request, $id = 0, $action = null)
-    {
-        try {
-
-            // TODO active challenge
-            $error = $this->error;
-            $authToken = $request->attributes->get('authToken');
-            $user = $authToken->user;
-
-            // find challenge
-            $challenge = Challenge::find($id);
-
-            if (!$challenge) {
-                return $this->notFound($error['challenges_not_found'], $error['ApiErrorCodes']['challenges_not_found']);
-            }
-
-            switch ($request->get('action')) {
-                case 'accept': {
-                    // TODO accept and detect who accepted
-
-                    if ($challenge->isDeclined()) {
-                        return $this->badRequest($error['challenges_declined'], $error['ApiErrorCodes']['challenges_declined']);
-                    }
-
-                    if ($challenge->isAccepted()) {
-                        return $this->badRequest($error['challenges_running'], $error['ApiErrorCodes']['challenges_running']);
-                    }
-
-                    // update challenge
-                    $challenge->fill(array(
-                        'opponent_status' => config('constants.CHALLENGE_STATUS.ACCEPTED'),
-                        'status' => config('constants.CHALLENGE_STATUS.ACCEPTED'),
-                        'start_at' => Carbon::now()
-                    ));
-                    $challenge->save();
-
-                    // send notification
-                    $this->sendNotifyTo('Head To Head Challenge Accepted', config('constants.NOTIFICATIONs.ACCEPT_CHALLENGE'), array(
-                        '@game' => $challenge->game->name,
-                        '@user' => $challenge->opponent->surname
-                    ), $user, $challenge);
-
-                    break;
-                }
-                case 'decline': {
-                    // TODO decline to challenge
-
-                    if ($challenge->isAccepted()) {
-                        return $this->badRequest($error['challenges_running'], $error['ApiErrorCodes']['challenges_running']);
-                    }
-
-                    // update challenge
-                    $challenge->fill(array(
-                        'opponent_STATUS' => config('constants.CHALLENGE_STATUS.DECLINED'),
-                        'status' => config('constants.CHALLENGE_STATUS.DECLINED')
-                    ));
-                    $challenge->save();
-
-                    // send notification
-                    $this->sendNotifyTo('Head To Head Challenge Declined', config('constants.NOTIFICATIONs.DECLINE_CHALLENGE'), array(
-                        '@game' => $challenge->game->name,
-                        '@user' => $challenge->opponent->surname
-                    ), $user, $challenge);
-
-                    break;
-                }
-            }
-
-            return $this->accepted($challenge);
+            return $this->created($product);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());
@@ -312,65 +185,39 @@ class ProductController extends ApiBasicController
             $user = $authToken->user;
             $input = $request->input();
 
-            // find challenge
-            $challenge = Challenge::where(function ($query) use ($user) {
-                if ($user->isUser()) {
-                    // filter by owner or opponent
-
-                    $query->where('user_id', $user->id)
-                        ->orWhere('opponent_id', $user->id);
-                }
-            })->find($id);
-
-            if (!$challenge) {
-                return $this->notFound($error['challenges_not_found'], $error['ApiErrorCodes']['challenges_not_found']);
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
             }
 
             // validation
             $messages = array(
-                'amount.required' => $error['ApiErrorCodes']['challenges_amount_required'],
-                'amount.min' => $error['ApiErrorCodes']['challenges_amount_min'],
-                'amount.max' => $error['ApiErrorCodes']['challenges_amount_max'],
-                'amount.numeric' => $error['ApiErrorCodes']['challenges_amount_invalid'],
-                'amount.regex' => $error['ApiErrorCodes']['challenges_amount_regex']
+                'collection_id.required' => $error['ApiErrorCodes']['products_collection_id_required'],
+                'categories_id.required' => $error['ApiErrorCodes']['products_categories_id_required'],
+                'name.required' => $error['ApiErrorCodes']['products_name_required'],
+                'detail.requireds' => $error['ApiErrorCodes']['products_detail_required']
             );
             $validatorError = Challenge::validate($input, 'RULE_UPDATE', $messages);
             if (!empty($validatorError)) {
                 return $this->respondWithError($validatorError);
             }
 
-            //save old amount
-            $oldAmount = $challenge->amount;
-
-            //check status of user
-            if($challenge->user_status === config('constants.CHALLENGE_STATUS.ACCEPTED')){
-                return $this->badRequest($error['challenges_users_accepted'], $error['ApiErrorCodes']['challenges_users_accepted']);
+            /// find product
+            $product = Product::find($id);
+            if (!$product) {
+                return $this->notFound($error['products_not_found'], $error['ApiErrorCodes']['products_not_found']);
             }
 
-            if($challenge->opponent_status === config('constants.CHALLENGE_STATUS.DECLINE')){
-                return $this->badRequest($error['challenges_users_declined'], $error['ApiErrorCodes']['challenges_users_declined']);
-            }
-
-            // update challenge
-            $challenge->fill(array(
-                'amount' => $input['amount']
+            // update
+            $product->fill(array(
+                'name' => $input['name'],
+                'collection_id' => $input['collection_id'],
+                'categories_id' => $input['categories_id'],
+                'detail' => $input['detail'],
             ));
-            $challenge->save();
+            $categories->save();
 
-            // send notification
-            $this->sendNotifyTo(
-                'Head To Head Challenge Raised',
-                config('constants.NOTIFICATIONs.RAISE_CHALLENGE'),
-                array(
-                    '@game' => $challenge->game->name,
-                    '@user' => $user->id === $challenge->user->id ? $challenge->opponent->surname : $challenge->user->surname,
-                    '@old_amount' => $oldAmount,
-                    '@new_amount' => $input['amount']
-                ),
-                $user->id === $challenge->user->id ? $challenge->opponent : $user,
-                $challenge);
-
-            return $this->accepted($challenge);
+            return $this->success($product);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());
@@ -395,7 +242,26 @@ class ProductController extends ApiBasicController
     public function destroy($id)
     {
         try {
-            // TODO destroy challenge
+            // TODO destroy product
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+
+            // check permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permissions_access_denied'], $error['ApiErrorCodes']['permissions_access_denied']);
+            }
+
+            // get product
+            $product = Product::find($id);
+            if (empty($product)) {
+                return $this->notFound($error['users_not_found'], $error['ApiErrorCodes']['users_not_found']);
+            }
+
+            $product->delete();
+
+            return $this->accepted($product);
+
 
 
         } catch (Exception $e) {

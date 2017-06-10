@@ -90,7 +90,11 @@ class CategoriesController extends ApiBasicController
 //            $user = $authToken->user;
 
             // find game
-            $categories = Categories::find($id);
+            $categories = Categories::with(array(
+                    'product',
+                    'product.collection'
+                ))
+            ->find($id);
             if (!$categories) {
                 return $this->notFound($error['categories_not_found'], $error['ApiErrorCodes']['categories_not_found']);
             }

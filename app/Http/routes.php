@@ -9,12 +9,12 @@ Route::get('/', function () {
 
 Route::group(array(
     'prefix' => '/api'
-), function () {
+    ), function () {
 
     // control user account
     Route::group(array(
         'prefix' => '/auth'
-    ), function () {
+        ), function () {
         Route::post('/login', 'Api\AuthController@login');
         Route::post('/confirm-token', 'Api\AuthController@confirm');
         Route::post('/forgot', 'Api\AuthController@forgot');
@@ -24,25 +24,25 @@ Route::group(array(
     });
     
     Route::group(array(
-            'prefix' => '/categories'
+        'prefix' => '/categories'
         ), function () {
-            Route::get('/', 'Api\CategoriesController@index');
-            Route::get('/{id}', 'Api\CategoriesController@get');
-            Route::get('/{id}/products', 'Api\CategoriesController@getProduct');
-        });
+        Route::get('/', 'Api\CategoriesController@index');
+        Route::get('/{id}', 'Api\CategoriesController@get');
+        Route::get('/{id}/products', 'Api\CategoriesController@getProduct');
+    });
 
-// products
-        Route::group(array(
-            'prefix' => '/products'
+    // products
+    Route::group(array(
+        'prefix' => '/products'
         ), function () {
 
-            Route::get('/', 'Api\ProductController@index');
-            Route::get('/{id}', 'Api\ProductController@get');
-            Route::post('/', 'Api\ProductController@create');
-            Route::put('/{id}', 'Api\ProductController@update');
-            Route::delete('/{id}', 'Api\ProductController@delete');
+        Route::get('/', 'Api\ProductController@index');
+        Route::get('/{id}', 'Api\ProductController@get');
+        Route::post('/', 'Api\ProductController@create');
+        Route::put('/{id}', 'Api\ProductController@update');
+        Route::delete('/{id}', 'Api\ProductController@delete');
 
-        });
+    });
 
     Route::get('/test', function () {
         echo \Illuminate\Support\Facades\Hash::make('Abc123456');
@@ -52,7 +52,7 @@ Route::group(array(
     // control admin account
     Route::group(array(
         'prefix' => '/admin'
-    ), function () {
+        ), function () {
         Route::post('/login', 'Api\AuthAdminController@login');
         Route::post('/forgot', 'Api\AuthAdminController@forgot');
         Route::post('/confirm-token', 'Api\AuthAdminController@confirm');
@@ -62,7 +62,7 @@ Route::group(array(
     // image
     Route::group(array(
         'prefix' => '/images'
-    ), function () {
+        ), function () {
         Route::get('/game/{id}', 'Api\ImageController@getGameImage');
         Route::get('/game/{id}/thumbnail', 'Api\ImageController@getGameThumbnail');
         Route::get('/results/{hash}', 'Api\ImageController@getResultImage');
@@ -70,47 +70,47 @@ Route::group(array(
     });
 
     // collections
-        Route::group(array(
-            'prefix' => '/collections'
+    Route::group(array(
+        'prefix' => '/collections'
         ), function () {
-            Route::get('/', 'Api\CollectionController@index');
-            Route::get('/{id}', 'Api\CollectionController@get');
-            Route::get('/{id}/products', 'Api\CollectionController@getProduct');
-            Route::post('/', 'Api\CollectionController@create');
-            Route::put('/{id}', 'Api\CollectionController@update');
-            Route::delete('/{id}', 'Api\CollectionController@delete');
-        });
+        Route::get('/', 'Api\CollectionController@index');
+        Route::get('/{id}', 'Api\CollectionController@get');
+        Route::get('/{id}/products', 'Api\CollectionController@getProduct');
+        Route::post('/', 'Api\CollectionController@create');
+        Route::put('/{id}', 'Api\CollectionController@update');
+        Route::delete('/{id}', 'Api\CollectionController@delete');
+    });
 
         // catalogs
-        Route::group(array(
-            'prefix' => '/catalogs'
+    Route::group(array(
+        'prefix' => '/catalogs'
         ), function () {
-            Route::get('/', 'Api\CatalogController@index');
-            Route::get('/{id}', 'Api\CatalogController@get');
-            Route::post('/', 'Api\CatalogController@create');
-            Route::put('/{id}', 'Api\CatalogController@update');
-            Route::delete('/{id}', 'Api\CatalogController@delete');
-        });
+        Route::get('/', 'Api\CatalogController@index');
+        Route::get('/{id}', 'Api\CatalogController@get');
+        Route::post('/', 'Api\CatalogController@create');
+        Route::put('/{id}', 'Api\CatalogController@update');
+        Route::delete('/{id}', 'Api\CatalogController@delete');
+    });
 
         // news
-        Route::group(array(
-            'prefix' => '/news'
+    Route::group(array(
+        'prefix' => '/news'
         ), function () {
-            Route::get('/{id}', 'Api\NewsController@get');
-            Route::post('/', 'Api\NewsController@create');
-            Route::put('/{id}', 'Api\NewsController@update');
-            Route::delete('/{id}', 'Api\NewsController@delete');
-        });
+        Route::get('/{id}', 'Api\NewsController@get');
+        Route::post('/', 'Api\NewsController@create');
+        Route::put('/{id}', 'Api\NewsController@update');
+        Route::delete('/{id}', 'Api\NewsController@delete');
+    });
 
 
     // apis require authenticated
     Route::group(array(
         'middleware' => array('api.authRequired')
-    ), function () {
+        ), function () {
 
         Route::group(array(
             'prefix' => '/verify'
-        ), function () {
+            ), function () {
             Route::post('/', 'Api\VerifyController@VerifyOTP');
             Route::post('/check', 'Api\VerifyController@checkVerifyOTP');
         });
@@ -118,7 +118,7 @@ Route::group(array(
         // administrator
         Route::group(array(
             'prefix' => '/admin'
-        ), function () {
+            ), function () {
             Route::get('/', 'Api\UserController@index');
             Route::get('/me', 'Api\AuthAdminController@findMe');
             Route::put('/me', 'Api\AuthAdminController@updateMe');
@@ -127,15 +127,25 @@ Route::group(array(
 
         Route::group(array(
             'prefix' => '/categories'
-        ), function () {
+            ), function () {
             Route::post('/', 'Api\CategoriesController@create');
-            Route::put('/', 'Api\CategoriesController@update');
+            Route::put('/{id}', 'Api\CategoriesController@update');
+        });
+
+        // products
+        Route::group(array(
+        'prefix' => '/products'
+        ), function () {
+        Route::post('/', 'Api\ProductController@create');
+        Route::put('/{id}', 'Api\ProductController@update');
+        Route::delete('/{id}', 'Api\ProductController@delete');
+
         });
 
         // registered user
         Route::group(array(
             'prefix' => '/auth'
-        ), function () {
+            ), function () {
             Route::get('/me', 'Api\AuthController@findMe');
             Route::post('/change-password', 'Api\AuthController@changePassword');
             Route::post('/upload', 'Api\AuthController@uploadAvatar');
@@ -146,14 +156,14 @@ Route::group(array(
 
         Route::group(array(
             'prefix' => '/roles'
-        ), function () {
+            ), function () {
             Route::get('/', 'Api\RoleController@index');
         });
 
         // user account api
         Route::group(array(
             'prefix' => '/users'
-        ), function () {
+            ), function () {
             Route::get('/', 'Api\UserController@index');
             Route::get('/{id}', 'Api\UserController@get');
             Route::get('/{id}/overview', 'Api\UserController@getOverview');
@@ -182,13 +192,13 @@ Route::group(array(
 
     Route::group(array(
         'middleware' => ['api.authNotRequired']
-    ), function () {
+        ), function () {
         //platforms
-    
+
         //games
         Route::group(array(
             'prefix' => '/games'
-        ), function () {
+            ), function () {
             Route::get('/', 'Api\GameController@index');
             Route::get('/{id}', 'Api\GameController@get');
             Route::post('/{id}/favourite', 'Api\GameController@favouriteTo');
@@ -197,14 +207,14 @@ Route::group(array(
         // locations
         Route::group(array(
             'prefix' => '/locations'
-        ), function () {
+            ), function () {
             Route::get('/', 'Api\LocationController@index');
         });
 
         // newsletter
         Route::group(array(
             'prefix' => '/newsletters'
-        ), function () {
+            ), function () {
             Route::get('/', 'Api\NewsletterController@index');
         });
     });

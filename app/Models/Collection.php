@@ -28,12 +28,12 @@ class Collection extends Model
 
     public static $rules = array(
         'RULE_CREATE' => array(
-            'categories_id' => 'required'
+            'categories_id' => 'required',
             'name' => 'required' 
         ),
 
         'RULE_UPDATE' => array(
-            'categories_id' => 'required'
+            'categories_id' => 'required',
             'name' => 'required' 
         )
     );

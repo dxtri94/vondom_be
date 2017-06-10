@@ -23,4 +23,13 @@ class Categories extends BaseModel
             'name' => 'required'
         )
     );
+    /**
+     *
+     * has many user
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function product()
+    {
+        return $this->hasMany('App\Models\Product', 'categories_id', 'id');
+    }
 }
