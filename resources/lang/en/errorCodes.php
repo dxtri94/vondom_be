@@ -32,9 +32,12 @@ $ApiCodes = array(
 
     //categories
     'categories_not_found' => 'The categories is not found',
+    'categories_name_required' => 'The categories name is required',
 
     //collections
-    'collections_not_found' => 'The collections is not found'
+    'collections_not_found' => 'The collections is not found',
+    'collections_categories_id_required' => 'The categories is required',
+    'collections_name_required' => 'The collection name is required',
 
 );
 
@@ -67,12 +70,15 @@ $ApiErrorCodes = array(
 
     //categories : 50xx
     'categories_not_found' => 5001,
+    'categories_name_required' => 5002,
 
     //catalog : 60xx
     'catalogs_not_found' => 6001,
 
     //collections : 70xx
     'collections_not_found' => 7001,
+    'collections_categories_id_required' => 7002,
+    'collections_name_required' => 7003,
 
     // permission: 98xx
     'permissions_access_denied' => 9800,

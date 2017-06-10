@@ -111,7 +111,7 @@ class CategoriesController extends ApiBasicController
 //            $authToken = $request->attributes->get('authToken');
 //            $user = $authToken->user;
 
-            // find game
+            // find categories
             $categories = Categories::find($id);
             if (!$categories) {
                 return $this->notFound($error['categories_not_found'], $error['ApiErrorCodes']['categories_not_found']);
@@ -129,20 +129,77 @@ class CategoriesController extends ApiBasicController
         }
     }
 
+    public function create(Request $request)
+    {
+        try {
+            // TODO create new newsletter
+
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+
+            $input = $request->input();
+
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
+            // validation
+            $messages = array(
+                'name.required' => $error['ApiErrorCodes']['categories_name_required']
+            );
+            $validatorError = Categories::validate($input, 'RULE_CREATE', $messages);
+            if (!empty($validatorError)) {
+                return $this->respondWithError($validatorError);
+            }
+
+            // create
+            $categories = new Categories($input);
+            $categories->save();
+
+            return $this->created($categories);
+
+        } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
     public function update(Request $request, $id = 0)
     {
         try {
-            // TODO update game
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+            $input = $request->input();
 
-            // detect user permission
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
 
-            // find game
+            // validation
+            $messages = array(
+                'name.required' => $error['ApiErrorCodes']['categories_name_required']
+            );
+            $validatorError = Categories::validate($input, 'RULE_CREATE', $messages);
+            if (!empty($validatorError)) {
+                return $this->respondWithError($validatorError);
+            }
 
-            // validate
+            // find categories
+            $categories = Categories::find($id);
+            if (!$categories) {
+                return $this->notFound($error['categories_not_found'], $error['ApiErrorCodes']['categories_not_found']);
+            }
 
-            // update game
+            // update
+            $categories->fill(array(
+                'name' => $input['name']
+            ));
+            $categories->save();
 
-            return $this->success();
+            return $this->success($categories);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());

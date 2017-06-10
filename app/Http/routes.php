@@ -125,6 +125,13 @@ Route::group(array(
             Route::post('/logout', 'Api\AuthAdminController@logout');
         });
 
+        Route::group(array(
+            'prefix' => '/categories'
+        ), function () {
+            Route::post('/', 'Api\CategoriesController@create');
+            Route::put('/', 'Api\CategoriesController@update');
+        });
+
         // registered user
         Route::group(array(
             'prefix' => '/auth'

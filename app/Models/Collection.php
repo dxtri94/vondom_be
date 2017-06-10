@@ -26,6 +26,18 @@ class Collection extends Model
         'src'
     );
 
+    public static $rules = array(
+        'RULE_CREATE' => array(
+            'categories_id' => 'required'
+            'name' => 'required' 
+        ),
+
+        'RULE_UPDATE' => array(
+            'categories_id' => 'required'
+            'name' => 'required' 
+        )
+    );
+
     /**
      * get src
      * @return \Illuminate\Contracts\Routing\UrlGenerator|mixed|null|string

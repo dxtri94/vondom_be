@@ -132,28 +132,75 @@ class CollectionController extends ApiBasicController
 
             $input = $request->input();
 
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
             // validation
             $messages = array(
-                'challenge_id.required' => $error['ApiErrorCodes']['disputes_challenge_id_required'],
-                'challenge_id.numeric' => $error['ApiErrorCodes']['disputes_challenge_id_number'],
-                'date.required' => $error['ApiErrorCodes']['disputes_date_required'],
-                'date.date' => $error['ApiErrorCodes']['disputes_date_date']
+                'categories_id.required' => $error['ApiErrorCodes']['collections_categories_id_required'],
+                'name.required' => $error['ApiErrorCodes']['collections_name_required'],
             );
-            $validatorError = Dispute::validate($input, 'RULE_CREATE', $messages);
+            $validatorError = Collection::validate($input, 'RULE_CREATE', $messages);
             if (!empty($validatorError)) {
                 return $this->respondWithError($validatorError);
             }
 
             // create new dispute
-            $dispute = new Dispute($input);
-            $dispute->fill(array(
-                'challenge_id' => $input['challenge_id'],
-                'date' => Carbon::now(),
-                'status' => config('constants.DISPUTE_STATUS.NEW')
+            $collection = new Collection($input);
+            $collection->fill(array(
+                'categories_id' => $input['categories_id'],
+                'name' => $input['name']
             ));
-            $dispute->save();
+            $collection->save();
 
-            return $this->success($dispute);
+            return $this->success($collection);
+
+        } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            // TODO create new dispute
+
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+            $input = $request->input();
+
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
+            // validation
+            $messages = array(
+                'categories_id.required' => $error['ApiErrorCodes']['collections_categories_id_required'],
+                'name.required' => $error['ApiErrorCodes']['collections_name_required'],
+            );
+            $validatorError = Collection::validate($input, 'RULE_CREATE', $messages);
+            if (!empty($validatorError)) {
+                return $this->respondWithError($validatorError);
+            }
+
+            // find categories
+            $collection = Categories::find($id);
+            if (!$collection) {
+                return $this->notFound($error['collection_not_found'], $error['ApiErrorCodes']['collection_not_found']);
+            }
+
+            // update
+            $collection->fill(array(
+                'categories_id' => $input['categories_id'],
+                'name' => $input['name']
+            ));
+            $collection->save();
+
+            return $this->success($collection);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());
