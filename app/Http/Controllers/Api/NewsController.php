@@ -93,17 +93,16 @@ class NewsController extends ApiBasicController
             // validation
             $messages = array(
                 'title.required' => $error['ApiErrorCodes']['newsletters_title_required'],
-                'title.min' => $error['ApiErrorCodes']['newsletters_title_min'],
-                'title.max' => $error['ApiErrorCodes']['newsletters_title_max'],
+                'location.required' => $error['ApiErrorCodes']['newsletters_location_required'],
                 'content.required' => $error['ApiErrorCodes']['newsletters_content_required']
             );
-            $validatorError = Newsletter::validate($input, 'RULE_CREATE', $messages);
+            $validatorError = News::validate($input, 'RULE_CREATE', $messages);
             if (!empty($validatorError)) {
                 return $this->respondWithError($validatorError);
             }
 
             // create
-            $newsletter = new Newsletter($input);
+            $newsletter = new News($input);
             $newsletter->save();
 
             return $this->created($newsletter);
@@ -132,17 +131,16 @@ class NewsController extends ApiBasicController
             // validation
             $messages = array(
                 'title.required' => $error['ApiErrorCodes']['newsletters_title_required'],
-                'title.min' => $error['ApiErrorCodes']['newsletters_title_min'],
-                'title.max' => $error['ApiErrorCodes']['newsletters_title_max'],
+                'location.required' => $error['ApiErrorCodes']['newsletters_location_required'],
                 'content.required' => $error['ApiErrorCodes']['newsletters_content_required']
             );
-            $validatorError = Newsletter::validate($input, 'RULE_CREATE', $messages);
+            $validatorError = News::validate($input, 'RULE_CREATE', $messages);
             if (!empty($validatorError)) {
                 return $this->respondWithError($validatorError);
             }
 
             // find newsletter
-            $newsletter = Newsletter::find($id);
+            $newsletter = News::find($id);
             if (!$newsletter) {
                 return $this->notFound($error['newsletters_not_found'], $error['ApiErrorCodes']['newsletters_not_found']);
             }
@@ -173,7 +171,7 @@ class NewsController extends ApiBasicController
             }
 
             // find newsletter
-            $newsletter = Newsletter::find($id);
+            $newsletter = News::find($id);
             if (!$newsletter) {
                 return $this->notFound($error['newsletters_not_found'], $error['ApiErrorCodes']['newsletters_not_found']);
             }
@@ -183,6 +181,63 @@ class NewsController extends ApiBasicController
             return $this->accepted($newsletter);
 
         } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
+    public function upload(Request $request, $id)
+    {
+        try {
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
+            // find categories
+            $news = News::find($id);
+            if (!$news) {
+                return $this->notFound($error['newsletters_not_found'], $error['ApiErrorCodes']['newsletters_not_found']);
+            }
+
+            // check input file
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+
+                // TODO upload
+                $destinationPath = base_path(config('constants.PATH.PRODUCT') . '/' . $news->id);
+                $filename = date('m-d-Y-H-i-s') . '-' . $news->id . '.' . $file->getClientOriginalExtension();
+
+                // make directory path
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+
+                // move file
+                $file->move($destinationPath, $filename);
+
+                // delete file image old
+                if (File::exists($destinationPath . '/' . $news->image)) {
+                    File::delete($destinationPath . '/' . $news->image);
+                }
+
+                // remove image
+                if ($news->path && File::exists($news->image)) {
+                    File::delete($news->path);
+                }
+
+                // save path image of user
+                $news->image = config('constants.PATH.PRODUCT') . '/' . $news->id . '/' . $filename;
+                $news->save();
+
+                return $this->success($news);
+            }
+
+            return $this->notFound($error['newsletters_file_required'], $error['ApiErrorCodes']['newsletters_file_required']);
+        } catch (\Exception $e) {
             return $this->badRequest($e->getMessage());
         }
     }

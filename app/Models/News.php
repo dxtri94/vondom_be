@@ -22,7 +22,9 @@ class News extends BaseModel
     
     );
 
-    protected $appends = array();
+    protected $appends = array(
+            'img_src'
+        );
 
     public $perPage = 20;
 
@@ -36,4 +38,19 @@ class News extends BaseModel
             'content' => 'required',
         ),
     );
+
+    /**
+     * get avatar src attribute
+     * @return string
+     */
+    public function getImgSrcAttribute()
+    {
+        if (strpos($this->image, 'http') !== false) {
+            return $this->image;
+        } else if ($this->image) {
+            return url("/api/images/news/$this->id?ver=" . rand(0, 1000000));
+        }
+
+        return null;
+    }
 }

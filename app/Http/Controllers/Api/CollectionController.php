@@ -207,6 +207,63 @@ class CollectionController extends ApiBasicController
         }
     }
 
+    public function upload(Request $request, $id)
+    {
+        try {
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
+            // find categories
+            $collection = Collection::find($id);
+            if (!$collection) {
+                return $this->notFound($error['collections_not_found'], $error['ApiErrorCodes']['collections_not_found']);
+            }
+
+            // check input file
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+
+                // TODO upload
+                $destinationPath = base_path(config('constants.PATH.COLLECTION') . '/' . $collection->id);
+                $filename = date('m-d-Y-H-i-s') . '-' . $collection->id . '.' . $file->getClientOriginalExtension();
+
+                // make directory path
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+
+                // move file
+                $file->move($destinationPath, $filename);
+
+                // delete file image old
+                if (File::exists($destinationPath . '/' . $collection->image)) {
+                    File::delete($destinationPath . '/' . $collection->image);
+                }
+
+                // remove image
+                if ($collection->image && File::exists($collection->image)) {
+                    File::delete($collection->image);
+                }
+
+                // save path image of user
+                $collection->image = config('constants.PATH.COLLECTION') . '/' . $collection->id . '/' . $filename;
+                $collection->save();
+
+                return $this->success($collection);
+            }
+
+            return $this->notFound($error['collections_file_required'], $error['ApiErrorCodes']['collections_file_required']);
+        } catch (\Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
     public function getProduct(Request $request, $id = 0)
     {
         try {

@@ -23,7 +23,7 @@ class Collection extends Model
     );
 
     protected $appends = array(
-        'src'
+        'img_src'
     );
 
     public static $rules = array(
@@ -39,18 +39,17 @@ class Collection extends Model
     );
 
     /**
-     * get src
-     * @return \Illuminate\Contracts\Routing\UrlGenerator|mixed|null|string
+     * get avatar src attribute
+     * @return string
      */
-    public function getSrcAttribute()
+    public function getImgSrcAttribute()
     {
-        if (!empty($this->path)) {
-            if (strpos($this->path, 'http') !== false) {
-                return $this->path;
-            } else if (File::exists(base_path($this->path))) {
-                return url("/api/images/game/$this->id?ver=" . rand(0, 1000000));
-            }
+        if (strpos($this->image, 'http') !== false) {
+            return $this->image;
+        } else if ($this->image) {
+            return url("/api/images/collections/$this->id?ver=" . rand(0, 1000000));
         }
+
         return null;
     }
 

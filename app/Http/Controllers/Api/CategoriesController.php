@@ -210,18 +210,85 @@ class CategoriesController extends ApiBasicController
         }
     }
 
+    public function upload(Request $request, $id)
+    {
+        try {
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
+            // find categories
+            $categories = Categories::find($id);
+            if (!$categories) {
+                return $this->notFound($error['categories_not_found'], $error['ApiErrorCodes']['categories_not_found']);
+            }
+
+            // check input file
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+
+                // TODO upload
+                $destinationPath = base_path(config('constants.PATH.CATEGORIES') . '/' . $categories->id);
+                $filename = date('m-d-Y-H-i-s') . '-' . $categories->id . '.' . $file->getClientOriginalExtension();
+
+                // make directory path
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+
+                // move file
+                $file->move($destinationPath, $filename);
+
+                // delete file image old
+                if (File::exists($destinationPath . '/' . $categories->img_path)) {
+                    File::delete($destinationPath . '/' . $categories->img_path);
+                }
+
+                // remove image
+                if ($categories->path && File::exists($categories->img_path)) {
+                    File::delete($categories->path);
+                }
+
+                // save path image of user
+                $categories->img_path = config('constants.PATH.CATEGORIES') . '/' . $categories->id . '/' . $filename;
+                $categories->save();
+
+                return $this->success($categories);
+            }
+
+            return $this->notFound($error['categories_file_required'], $error['ApiErrorCodes']['categories_file_required']);
+        } catch (\Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
     public function destroy(Request $request, $id = 0)
     {
         try {
-            // TODO destroy game
+            // TODO destroy product
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
 
-            // detect user permission
+            // check permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permissions_access_denied'], $error['ApiErrorCodes']['permissions_access_denied']);
+            }
 
-            // find game
+            // get product
+            $categories = Categories::find($id);
+            if (empty($product)) {
+                return $this->notFound($error['categories_not_found'], $error['ApiErrorCodes']['categories_not_found']);
+            }
 
-            // delete game
+            $categories->delete();
 
-            return $this->accepted();
+            return $this->accepted($categories);
 
         } catch (Exception $e) {
             return $this->badRequest($e->getMessage());

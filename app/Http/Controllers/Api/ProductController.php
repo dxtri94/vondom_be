@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use League\Flysystem\Exception;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\File;
 
 /**
  * @SWG\Resource(
@@ -84,6 +85,24 @@ class ProductController extends ApiBasicController
      */
     public function get(Request $request, $id = 0)
     {
+        try {
+            // TODO find game by id
+
+            $error = $this->error;
+//            $authToken = $request->attributes->get('authToken');
+//            $user = $authToken->user;
+
+            // find game
+            $product = Product::find($id);
+            if (!$product) {
+                return $this->notFound($error['products_not_found'], $error['ApiErrorCodes']['products_not_found']);
+            }
+
+            return $this->success($product);
+
+        } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
     }
 
     /**
@@ -215,11 +234,68 @@ class ProductController extends ApiBasicController
                 'categories_id' => $input['categories_id'],
                 'detail' => $input['detail'],
             ));
-            $categories->save();
+            $product->save();
 
             return $this->success($product);
 
         } catch (Exception $e) {
+            return $this->badRequest($e->getMessage());
+        }
+    }
+
+    public function upload(Request $request, $id)
+    {
+        try {
+            $error = $this->error;
+            $authToken = $request->attributes->get('authToken');
+            $user = $authToken->user;
+
+            // detect permission
+            if (!$user->isAdmin()) {
+                return $this->badRequest($error['permission_access_denied'], $error['ApiErrorCodes']['permission_access_denied']);
+            }
+
+            // find categories
+            $product = Product::find($id);
+            if (!$product) {
+                return $this->notFound($error['products_not_found'], $error['ApiErrorCodes']['products_not_found']);
+            }
+
+            // check input file
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+
+                // TODO upload
+                $destinationPath = base_path(config('constants.PATH.PRODUCT') . '/' . $product->id);
+                $filename = date('m-d-Y-H-i-s') . '-' . $product->id . '.' . $file->getClientOriginalExtension();
+
+                // make directory path
+                if (!File::exists($destinationPath)) {
+                    File::makeDirectory($destinationPath, $mode = 0777, true, true);
+                }
+
+                // move file
+                $file->move($destinationPath, $filename);
+
+                // delete file image old
+                if (File::exists($destinationPath . '/' . $product->image)) {
+                    File::delete($destinationPath . '/' . $product->image);
+                }
+
+                // remove image
+                if ($product->path && File::exists($product->image)) {
+                    File::delete($product->path);
+                }
+
+                // save path image of user
+                $product->image = config('constants.PATH.PRODUCT') . '/' . $product->id . '/' . $filename;
+                $product->save();
+
+                return $this->success($product);
+            }
+
+            return $this->notFound($error['products_file_required'], $error['ApiErrorCodes']['products_file_required']);
+        } catch (\Exception $e) {
             return $this->badRequest($e->getMessage());
         }
     }

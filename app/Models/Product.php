@@ -21,6 +21,10 @@ class Product extends BaseModel
         'updated_at'
     );
 
+    protected $appends = array(
+        'img_src'
+    );
+
     protected $perPage = 20;
 
     protected $casts = array(
@@ -35,9 +39,28 @@ class Product extends BaseModel
         ),
 
         'RULE_UPDATE' => array(
-            'amount' => 'required|min:1|max:500|numeric|regex:/^[0-9]+(\.[0-9]{1,2})?$/'
+            'collection_id' => 'required',
+            'categories_id' => 'required',
+            'name' => 'required',
+            'detail' => 'required'
         )
     );
+
+
+    /**
+     * get avatar src attribute
+     * @return string
+     */
+    public function getImgSrcAttribute()
+    {
+        if (strpos($this->image, 'http') !== false) {
+            return $this->image;
+        } else if ($this->image) {
+            return url("/api/images/products/$this->id?ver=" . rand(0, 1000000));
+        }
+
+        return null;
+    }
 
     /**
      * relation to categories

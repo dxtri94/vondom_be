@@ -21,7 +21,26 @@ class Catalog extends Model
         'updated_at'
     );
 
+    protected $appends = array(
+        'img_main_src',
+        'img_sub_src'
+    );
+
     protected $perPage = 50;
+
+    public static $rules = array(
+        'RULE_CREATE' => array(
+            'name' => 'required',
+            'link' => 'required|url',
+            'description' => 'required'
+        ),
+
+        'RULE_UPDATE' => array(
+            'name' => 'required',
+            'link' => 'required|url',
+            'description' => 'required'
+        )
+    );
 
     public function setLabelsAttribute($value)
     {
@@ -31,6 +50,36 @@ class Catalog extends Model
     public function getLabelsAttribute()
     {
         return json_decode($this->attributes['labels'], false);
+    }
+
+    /**
+     * get avatar src attribute
+     * @return string
+     */
+    public function getImgMainSrcAttribute()
+    {
+        if (strpos($this->main_img, 'http') !== false) {
+            return $this->main_img;
+        } else if ($this->main_img) {
+            return url("/api/images/catalogs/$this->id/main?ver=" . rand(0, 1000000));
+        }
+
+        return null;
+    }
+
+    /**
+     * get avatar src attribute
+     * @return string
+     */
+    public function getImgSubSrcAttribute()
+    {
+        if (strpos($this->sub_img, 'http') !== false) {
+            return $this->sub_img;
+        } else if ($this->sub_img) {
+            return url("/api/images/catalogs/$this->id/sub?ver=" . rand(0, 1000000));
+        }
+
+        return null;
     }
 
 }

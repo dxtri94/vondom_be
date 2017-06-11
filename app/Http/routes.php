@@ -38,10 +38,6 @@ Route::group(array(
 
         Route::get('/', 'Api\ProductController@index');
         Route::get('/{id}', 'Api\ProductController@get');
-        Route::post('/', 'Api\ProductController@create');
-        Route::put('/{id}', 'Api\ProductController@update');
-        Route::delete('/{id}', 'Api\ProductController@delete');
-
     });
 
     Route::get('/test', function () {
@@ -63,8 +59,13 @@ Route::group(array(
     Route::group(array(
         'prefix' => '/images'
         ), function () {
-        Route::get('/game/{id}', 'Api\ImageController@getGameImage');
-        Route::get('/game/{id}/thumbnail', 'Api\ImageController@getGameThumbnail');
+        Route::get('/categories/{id}', 'Api\ImageController@getCategoriesImage');
+        Route::get('/categories/{id}/thumbnail', 'Api\ImageController@getCategoriesThumbnail');
+        Route::get('/collections/{id}', 'Api\ImageController@getCollectionImage');
+        Route::get('/products/{id}', 'Api\ImageController@getproductImage');
+        Route::get('/catalogs/{id}/main', 'Api\ImageController@getCatalogMainImage');
+        Route::get('/catalogs/{id}/sub', 'Api\ImageController@getCatalogSubImage');
+        Route::get('/news/{id}', 'Api\ImageController@getNewsImage');
         Route::get('/results/{hash}', 'Api\ImageController@getResultImage');
         Route::get('/results/{hash}/thumbnail', 'Api\ImageController@getResultThumbnail');
     });
@@ -76,9 +77,6 @@ Route::group(array(
         Route::get('/', 'Api\CollectionController@index');
         Route::get('/{id}', 'Api\CollectionController@get');
         Route::get('/{id}/products', 'Api\CollectionController@getProduct');
-        Route::post('/', 'Api\CollectionController@create');
-        Route::put('/{id}', 'Api\CollectionController@update');
-        Route::delete('/{id}', 'Api\CollectionController@delete');
     });
 
         // catalogs
@@ -87,19 +85,14 @@ Route::group(array(
         ), function () {
         Route::get('/', 'Api\CatalogController@index');
         Route::get('/{id}', 'Api\CatalogController@get');
-        Route::post('/', 'Api\CatalogController@create');
-        Route::put('/{id}', 'Api\CatalogController@update');
-        Route::delete('/{id}', 'Api\CatalogController@delete');
     });
 
         // news
     Route::group(array(
         'prefix' => '/news'
         ), function () {
+        Route::get('/', 'Api\NewsController@index');
         Route::get('/{id}', 'Api\NewsController@get');
-        Route::post('/', 'Api\NewsController@create');
-        Route::put('/{id}', 'Api\NewsController@update');
-        Route::delete('/{id}', 'Api\NewsController@delete');
     });
 
 
@@ -129,7 +122,19 @@ Route::group(array(
             'prefix' => '/categories'
             ), function () {
             Route::post('/', 'Api\CategoriesController@create');
+            Route::post('/{id}/upload', 'Api\CategoriesController@upload');
             Route::put('/{id}', 'Api\CategoriesController@update');
+
+        });
+
+        // collections
+        Route::group(array(
+        'prefix' => '/collections'
+        ), function () {
+        Route::post('/', 'Api\CollectionController@create');
+        Route::post('/{id}/upload', 'Api\CollectionController@upload');
+        Route::put('/{id}', 'Api\CollectionController@update');
+        Route::delete('/{id}', 'Api\CollectionController@delete');
         });
 
         // products
@@ -137,10 +142,31 @@ Route::group(array(
         'prefix' => '/products'
         ), function () {
         Route::post('/', 'Api\ProductController@create');
+        Route::post('/{id}/upload', 'Api\ProductController@upload');
         Route::put('/{id}', 'Api\ProductController@update');
         Route::delete('/{id}', 'Api\ProductController@delete');
 
         });
+
+           // catalogs
+    Route::group(array(
+        'prefix' => '/catalogs'
+        ), function () {
+        Route::post('/', 'Api\CatalogController@create');
+        Route::post('/{id}/upload', 'Api\CatalogController@upload');
+        Route::put('/{id}', 'Api\CatalogController@update');
+        Route::delete('/{id}', 'Api\CatalogController@delete');
+    });
+
+        // news
+    Route::group(array(
+        'prefix' => '/news'
+        ), function () {
+        Route::post('/', 'Api\NewsController@create');
+        Route::post('/{id}/upload', 'Api\NewsController@upload');
+        Route::put('/{id}', 'Api\NewsController@update');
+        Route::delete('/{id}', 'Api\NewsController@delete');
+    });
 
         // registered user
         Route::group(array(
@@ -175,19 +201,6 @@ Route::group(array(
             Route::put('/{id}', 'Api\UserController@update');
             Route::delete('/{id}', 'Api\UserController@delete');
         });
-
-//        // categories
-//        Route::group(array(
-//            'prefix' => '/categories'
-//        ), function () {
-//            Route::get('/', 'Api\CategoriesController@index');
-//            Route::get('/{id}', 'Api\CategoriesController@get');
-//            Route::post('/{action}', 'Api\CategoriesController@create');
-//            Route::put('/{id}', 'Api\CategoriesController@update');
-//            Route::delete('/{id}', 'Api\CategoriesController@delete');
-//
-//        });
-
     });
 
     Route::group(array(
